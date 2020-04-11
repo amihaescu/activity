@@ -1,32 +1,38 @@
 const mongoose = require('mongoose');
 
 var teamSchema = new mongoose.Schema({
-    members: [String],
-    position: Integer
+    _members: [String],
+    _position: Number
 })
 
 var boardSchema = new mongoose.Schema({
-    status: String,
-    name: String,
-    teams: [teamSchema],
+    _status: String,
+    _name: String,
+    _teams: [teamSchema],
   }
 );
 var Board = mongoose.model('Board', boardSchema);
 
 function save() {
-    return new Board({status: "In Progress", name: "Game1", 
-            teams: [
-                {members: ["Alex", "Lalal"]},
-                {members: ["Andrei", "Radu"]}
-            ]
+    return new Board({
+        _status: "In Progress", 
+        _name: "Game1", 
+        _teams: [
+            {_members: ["Alex", "Lalal"], _position: 0},
+            {_members: ["Andrei", "Radu"], _position: 0}
+        ]
     }).save()
 }
 
+function findById(id) {
+    return Board.findById(id)
+}
 function findAll() {
     return Board.find()
 }
 
 module.exports = {
     save: save,
-    findAll: findAll
+    findAll: findAll,
+    findById: findById
 };
