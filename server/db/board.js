@@ -1,13 +1,25 @@
 const mongoose = require('mongoose');
 
-var schema = new mongoose.Schema({
-    name: 'string'
+var teamSchema = new mongoose.Schema({
+    members: [String],
+    position: Integer
+})
+
+var boardSchema = new mongoose.Schema({
+    status: String,
+    name: String,
+    teams: [teamSchema],
   }
 );
-var Board = mongoose.model('Board', schema);
+var Board = mongoose.model('Board', boardSchema);
 
-function save(name) {
-    return new Board({name: name}).save()
+function save() {
+    return new Board({status: "In Progress", name: "Game1", 
+            teams: [
+                {members: ["Alex", "Lalal"]},
+                {members: ["Andrei", "Radu"]}
+            ]
+    }).save()
 }
 
 function findAll() {

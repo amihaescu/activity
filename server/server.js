@@ -5,7 +5,7 @@ const express = require('express')
 const port = 3000
 
 database.db_init().then(console.log("Connected to database"))
-board.save("Activity1").then((args) => {console.log("Saved "+args)});
+board.save().then((args) => {console.log("Saved "+args)});
 
 app = express()
 app.get('/', (req, res) => res.send('Hello World!'))
