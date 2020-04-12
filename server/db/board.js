@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const cards_service = require('../cards/cards-service');
 
 var teamSchema = new mongoose.Schema({
     _members: [String],
@@ -29,8 +30,24 @@ function newTeam(boardId){
 }
 
 function addToTeam(boardId, teamId, teamMember) {
-    console.log(boardId, teamId,teamMember)
     return Board.findOneAndUpdate({"_id": boardId, "_teams._id": teamId}, { $push: {"_teams.$._members": teamMember}}, {new: true})
+}
+
+function getCardForTeam(params) {
+    return Board.findById({"_id": params.id}).then( board => {
+        var teamPosition = board._teams.filter(it => it._id == params.teamId).map(it => it._position);
+        var teamActivity = board._tiles[teamPosition]
+        var teamCard = cards_service.getCardForLevel(params.level)
+        teamCard["activity"] = teamActivity
+        return teamCard
+    })    
+}
+
+function advanceTeam(request) {
+    var params = request.params
+    console.log(params)
+    console.log(request.body)
+    return Board.findOneAndUpdate({"_id": params.id, "_teams._id": params.teamId}, { $inc: {"_teams.$._position": request.body.value}}, {new: true})
 }
 
 function randomizeTiles() {
@@ -55,5 +72,7 @@ module.exports = {
     findAll: findAll,
     findById: findById,
     newTeam: newTeam,
-    addToTeam: addToTeam
+    addToTeam: addToTeam,
+    getCardForTeam: getCardForTeam,
+    advanceTeam: advanceTeam
 };

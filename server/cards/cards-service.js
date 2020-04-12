@@ -17,13 +17,6 @@ const allLevelcards = [
     {level: 5, cards :level5Cards}
 ]
 
-function init(app) {
-    app.get('/cards/:level', (req, res) => {
-        const card = getCardForLevel(req.params.level)
-        res.send(card)
-    })
-}
-
 function getCardForLevel(level) {
     console.log("level "+ level)
     const items = allLevelcards[level - 3].cards
@@ -32,5 +25,5 @@ function getCardForLevel(level) {
 
 module.exports = {
     getCardForLevel: getCardForLevel,
-    init: init
+
 }

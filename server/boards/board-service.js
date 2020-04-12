@@ -13,8 +13,14 @@ function init(app) {
     app.post('/board/:id/team', (req, res) =>{
         board.newTeam(req.params.id).then(result => res.send(result))
     })
-    app.post('/board/:id/team/:teamId', (req, res) =>{
+    app.put('/board/:id/team/:teamId', (req, res) =>{
         board.addToTeam(req.params.id, req.params.teamId, req.body.name).then(result => res.send(result))
+    })
+    app.get('/board/:id/team/:teamId/card/:level', (req, res) =>{
+        board.getCardForTeam(req.params).then(result => res.send(result))
+    })
+    app.put('/board/:id/team/:teamId/position', (req, res) =>{
+        board.advanceTeam(req).then(result => res.send(result))
     })
 
 }
