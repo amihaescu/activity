@@ -18,15 +18,16 @@ var Board = mongoose.model('Board', boardSchema);
 
 function newBoard(name) {
     return new Board({
-        _status: "Not started", 
+        _status: "Started", 
         _name: name, 
         _tiles: randomizeTiles(),
-        _teams: []
+        _teams: [],
+        _currentTeam: 0
     }).save()
 }
 
 function newTeam(boardId){
-    return Board.updateOne({_id: boardId}, { $push: {_teams: {}}})
+    return Board.findOneAndUpdate({_id: boardId}, { $push: {_teams: { _position: 0}}}, {new: true})
 }
 
 function addToTeam(boardId, teamId, teamMember) {
@@ -49,14 +50,18 @@ function advanceTeam(request) {
     console.log(request.body)
     return Board
         .findOneAndUpdate({"_id": params.id, "_teams._id": params.teamId}, { $inc: {"_teams.$._position": request.body.value}}, {new: true})
-        .then(newBoard => {
-            team = newBoard._teams.filter(it => it._id == params.teamId)
-            if ( team[0]._position> 15){
-                console.log("Team won")
+        .then(newBoard => checkWinningTeam(newBoard, params))
+}
+
+function checkWinningTeam(newBoard, params){
+    team = newBoard._teams.filter(it => it._id == params.teamId)
+            if ( team[0]._position >= 49){
                 return Board.findOneAndUpdate({"_id": params.id}, {$set: {"_status": "Finished"}}, {new: true})
             }
-            else return newBoard
-        })
+            else {
+                var currentTeam = (newBoard._teams.map(it => it._id).indexOf(params.teamId) + 1) % newBoard._teams.length
+                return Board.findOneAndUpdate({"_id": params.id}, {$set: {"_currentTeam": currentTeam}}, {new: true})
+            }
 }
 
 function randomizeTiles() {
