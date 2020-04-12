@@ -47,7 +47,16 @@ function advanceTeam(request) {
     var params = request.params
     console.log(params)
     console.log(request.body)
-    return Board.findOneAndUpdate({"_id": params.id, "_teams._id": params.teamId}, { $inc: {"_teams.$._position": request.body.value}}, {new: true})
+    return Board
+        .findOneAndUpdate({"_id": params.id, "_teams._id": params.teamId}, { $inc: {"_teams.$._position": request.body.value}}, {new: true})
+        .then(newBoard => {
+            team = newBoard._teams.filter(it => it._id == params.teamId)
+            if ( team[0]._position> 15){
+                console.log("Team won")
+                return Board.findOneAndUpdate({"_id": params.id}, {$set: {"_status": "Finished"}}, {new: true})
+            }
+            else return newBoard
+        })
 }
 
 function randomizeTiles() {
